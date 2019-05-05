@@ -10,10 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_04_231432) do
+ActiveRecord::Schema.define(version: 2019_05_05_182330) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "brands", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "companies", force: :cascade do |t|
     t.string "name"
@@ -21,6 +33,30 @@ ActiveRecord::Schema.define(version: 2019_04_04_231432) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "status", default: "pending"
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.string "name"
+    t.integer "price_cents"
+    t.bigint "company_id"
+    t.bigint "category_id"
+    t.bigint "brand_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id"], name: "index_products_on_brand_id"
+    t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["company_id"], name: "index_products_on_company_id"
+  end
+
+  create_table "sales", force: :cascade do |t|
+    t.bigint "product_id"
+    t.bigint "company_id"
+    t.integer "amount_cents"
+    t.integer "product_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_sales_on_company_id"
+    t.index ["product_id"], name: "index_sales_on_product_id"
   end
 
   create_table "transfers", force: :cascade do |t|
@@ -44,6 +80,11 @@ ActiveRecord::Schema.define(version: 2019_04_04_231432) do
     t.integer "lock_version", default: 0
   end
 
+  add_foreign_key "products", "brands"
+  add_foreign_key "products", "categories"
+  add_foreign_key "products", "companies"
+  add_foreign_key "sales", "companies"
+  add_foreign_key "sales", "products"
   add_foreign_key "transfers", "companies"
   add_foreign_key "transfers", "users"
 end
